@@ -86,7 +86,7 @@ ANSWER: Always take 0,001 seconds on my machine. Not very fast?
 create_index("getSample", "wsId", "HASH", "unique");
 
 /* Reoptimize getSample: */
-reoptimize("getSample");
+reoptimize("getSample");  
 
 /* Inspect execution plan of getSample: */
 pc("getSample");
@@ -333,6 +333,7 @@ create function kdtreeProximitySearch(Integer xid, Vector of Number f,
 create function closeWineSamples2(WineSample ws, Number distance) 
                                 -> Bag of WineSample
   /**TODO 4.b Your code here*/;
+    as kdtreeProximitySearch(winesampleIndex(), features(ws), distance);
 
 /* What are the wine samples within distance 5 from :ws? */
 closeWineSamples2(:ws, 3); /* New way */
@@ -350,6 +351,9 @@ pc("closeWinesamples");
 pc("closeWinesamples2");
 /* Notice that winesampleindex() contains exactly one object */
 /** TODO Comments? Will it scale? Why? */
+/*
+ANSWER: closeWinesamples2 scales better than closewinsamples since it uses ... instead of HASH-FULL-SCAN.
+*/
 
 /* Run proximity query 10 times for closeWinsamples (old way)
    to investgate speed: */
@@ -367,6 +371,9 @@ closeWineSamples2(:ws, 3); /* New way */
 
 closeWineSamples2(:ws, 3); /* New way */
 /* TODO 5 Comments on result? Why? */
+/*
+ANSWER: ???
+*/
 
 /* -----------------------------------------------------------------------
  Exercise 6.a 
@@ -411,7 +418,7 @@ add_index_rewrite_rule('KDTREE', #'euclid', #'kdtreeProximitySearch');
   Index the parameter 'f' of the table 'features' using KDTREE index
  ------------------------------------------------------------------------ */
 /**TODO 6.c Your code here*/
-
+create_index('features', 'f', 'KDTREE', 'multipless');
 recompile(#'closeWineSamples');
 
 pc("closeWinesamples");
@@ -435,6 +442,7 @@ closeWinesamples(:ws,3);
   using KDTREE index to one using XTREE instead
  ------------------------------------------------------------------------ */
 /**TODO 7.a */
+create_index('features', 'f', 'XTREE', 'multipless');
 
 /* Reoptimize closeWinesamples: */
 reoptimize("closeWinesamples");
@@ -458,6 +466,7 @@ closeWineSamples(:ws, 3);
  ------------------------------------------------------------------------ */
 create function featuredWineSamples(Vector of Number fv)->Bag of Winesample
   /**TODO 8.a Your code here */;
+    select ws from Winesample ws where features(ws) = fv;
 
 
 set :fv = {7,0.31,0.26,7.4,0.069,28,160,0.9954,3.13,0.46,9.8};
