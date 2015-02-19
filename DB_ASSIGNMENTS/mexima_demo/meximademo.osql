@@ -1,0 +1,89 @@
+/*-*-sql-*-*******************************************************************
+ * AMOS2
+ *
+ * Author: (c) 2010 Thanh Truong, UDBL
+ * $RCSfile: AMOSQL,v $
+ * $Revision: 1.1 $ $Date: 2006/02/12 20:01:08 $
+ * $State: Exp $ $Locker:  $
+ *
+ * Description:  
+ *  DEMONTRATION ON HOW TO INTRODUCE A NEW INDEXING STRUCTURE TO AMOS II ***
+ * 
+ *  In this demontration, we make the built-in HashTable in Java as an external
+ *  index of AMOS II. 
+ *  This is done by implementing a set of foreign functions in  Java:
+ *  make, put, get, delete, mapper and clear respectively.
+ *
+ *  Run this demo in JavaAmos.
+ *
+ ****************************************************************************
+ * $Log: AMOSQL,v $
+ *
+ ****************************************************************************/
+
+ /*----------------------------------------------------------------------------
+ Foreign functions : MAKE, PUT, DELETE, GET, CLEAR and MAPPER
+ -----------------------------------------------------------------------------*/
+ create function JHashTable_make() -> Integer
+  as foreign 'JAVA:HashTableDriver/JHashTable_make';
+
+ create function JHashTable_put(Integer xtId, Object f, Object o)-> Object
+  as foreign 'JAVA:HashTableDriver/JHashTable_put';
+
+ create function JHashTable_delete(Integer xtId, Object f) -> Boolean
+  as foreign 'JAVA:HashTableDriver/JHashTable_delete';
+
+ create function JHashTable_get(Integer xtId, Object o) ->Bag of Object
+  as foreign 'JAVA:HashTableDriver/JHashTable_get';
+
+ create function JHashTable_clear(Integer xtId)-> Boolean
+  as foreign 'JAVA:HashTableDriver/JHashTable_clear';
+
+ create function JHashTable_map(Integer xtId)-> Bag of Object
+  as foreign 'JAVA:HashTableDriver/JHashTable_mapper';
+
+
+/*Register JHASHTABLE as external index type.
+  The second parameter TRUE means saving/restoring index info taken care 
+  by the system ( MEXINMA)*/
+register_exindextype('JHASHTABLE', FALSE);
+
+
+/*----------------------------------------------------------------------------
+Use jhahstable index type
+-----------------------------------------------------------------------------*/
+create function phoneof(Charstring name)-> Number  
+ pn as stored;
+
+/*Create jhashTABLE index on function phoneof*/
+create_index('phoneof', 'pn', 'JHashTable', 'multiple');
+
+/*Drop Hash index*/
+drop_index('phoneof', 'name');
+
+/*Populate data*/
+add phoneof("Alex")    = 765809542;
+add phoneof("Hanna")   = 765805544;
+add phoneof("Paul")    =  715809542;
+add phoneof("Anders") = 795909542;
+
+add phoneof("Johan")   = 795909542;
+add phoneof("Julia")   = 795729542;
+add phoneof("Diego")   =  765809542;
+
+remove phoneof("Paul") =  715809542;
+
+/*Full scan*/
+create function q() -> Bag of <Charstring, Number> 
+ as select p, n from Charstring p, Number n where phoneof(p) = n;
+
+/*Index scan*/
+create function q1(Number i) -> Charstring nm
+ as select nm  where phoneof(nm) = i;
+
+/*See execution plans*/
+pc("q");
+
+pc("q1");
+
+

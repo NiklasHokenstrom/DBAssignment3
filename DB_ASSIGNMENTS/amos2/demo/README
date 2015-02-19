@@ -1,0 +1,43 @@
+This folder contains examples of Amos II application programs.
+
+----------------------
+An example database containing socker World Cup data is defined by the
+scripts:
+  tutorial.amosql
+  wcdata.amosql
+Load World Cup database with the command:
+  amos2 -O tutorial.amosql
+
+----------------------
+The example source codes below include comments describing how to
+compile and use them.
+
+Example of application program in Java:
+  ClientDemo.java
+
+Example of application program in C:
+  clientdemo.c
+
+Examples of foreign functions implemented in Java:
+
+  Hello.java    A 'Hello World' function
+  Sqrt2.java    A function with 1 argument and 2 results
+  Harmonic.java A function with 1 argument returning a bag of numbers
+  Foreign.java  Examples of several different kinds foreign functions
+
+Example of foreign functions implemented in C:
+  foreign.c
+
+Unix installations contains a Makefile to compile all C code.
+
+Windows installations have *.vcxproj files for compiling C code using
+Microsoft Visual Studio.
+
+----------------------
+NOTICE: To run javaamos you must have a java instance that supports a
+32-bit JVM. To see whether this is the case, issue the command:
+  java -d32
+
+If you use Linux there is a java instance that supports a 32-bit JVM
+in
+http://www.it.uu.se/research/group/udbl/software/JVM/jdk-6u20-linux-i586.bin.

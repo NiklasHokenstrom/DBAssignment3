@@ -1,0 +1,61 @@
+This folder contains the following examples of Amos II foreign
+functions implemented in Java:
+
+  Hello.java    A 'Hello World' function
+  Sqrt2.java    A function with 1 argument and 2 results
+  Harmonic.java A function with 1 argument returning a bag of numbers
+
+Portable 32-bits Java
+---------------------
+
+To run Amos with Java you must have a Java instance that
+supports a 32-bit JVM. To see whether this is the case for your
+current Java installation, issue the command:
+  java -d32
+
+In case the above command fails, do the following:
+
+Download a 32-bits Java for Windows that does not need any
+installation:
+http://www.it.uu.se/research/group/udbl/software/JVM/PortableJava.zip
+
+Unzip it to the root folder X: of your USB stick or whereever you want to
+place it. A subdirectory named 'X:java' will be created. Set PATH to
+include the 'X:java\bin' subfolder. That's it! No administrators needed.
+
+For Linux there is a 32-bits Java in
+http://www.it.uu.se/research/group/udbl/software/JVM/jdk-6u20-linux-i586.bin
+
+Compiling and running foreign functions
+---------------------------------------
+
+To run javaamos you must include '..\bin' in PATH, and
+'.;../bin/javaamos.jar' in CLASSPATH. Furthermore they have to
+included javac when the installed the PCs in the lab room.
+
+Read the master comment in Hello.java for how to compile and use a
+foreign Amos function written in Java. Understand and compile
+Hello.java and test it. Do the same for Sqrt2.java and Harmonic.java.
+
+Lab room setup
+--------------
+
+Assume 
+1. your stick is mounted on E:, 
+2. the root folder of E: has the folder E:\amos2, 
+3. the folder of this file is E:\amos2\demo, and
+4. the portable java is located in folder E:\java. 
+
+Then the following settings will make it possible to run javaamos from
+this folder on a lab room PC:
+
+set PATH=E:\java\bin;E:\amos2\bin;%PATH%;C:\Program Files\Java\jdk1.7.0_09\bin
+set CLASSPATH=.;E:\amos2\bin\javaamos.jar
+
+Test that the javacompile works with
+javac Hello.java
+
+Test that javaamos works with
+javaamos
+JavaAMOS 1> create function hello()->Charstring as foreign 'JAVA:Hello/helloF';
+JavaAMOS 2> hello();
