@@ -91,11 +91,8 @@ public class KDTreeIndex_Stub {
      -----------------------------------------------------------------*/
     public void kdtree_make(CallContext cxt, Tuple tpl)throws AmosException{
 	// TODO Increase idgen by 1
-    	tpl.setElem(0,idgen);
-    	idgen++;
 
 	// TODO Return the current value of idgen 
-    	cxt.emit(tpl);
     }
 
     /*-----------------------------------------------------------------
@@ -117,8 +114,7 @@ public class KDTreeIndex_Stub {
 	KDTree<Oid>  m = locateKdtree(id);
 	
 	if (m != null){
-	    // TODO Insert to KD-tree
-	    m.insert(key, val);    
+	    // TODO Insert to KD-tree	    
 	}
 
 	// Emit val to tpl 
@@ -132,23 +128,22 @@ public class KDTreeIndex_Stub {
     public void kdtree_get(CallContext cxt, Tuple tpl)throws AmosException, 
 	KeyDuplicateException, KeySizeException {
 	// TODO Get the id 
-		int id = tpl.getIntElem(0);
-	// TODO Extract feature vector f as key
-		double [] key  = toArray(tpl.getSeqElem(1));
-	// Amos object 
-	 	Oid val = null;
 
-	KDTree<Oid> m = locateKdtree(id);
+	// TODO Extract feature vector f as key
+	
+	// Amos object 
+	Oid val = null;
+
+	KDTree<Oid> m = null;
 	// TODO Get the KD-tree whose id = id	
 
 	if (m != null){
 	    // TODO Search in KD-tree val associated with key
-	    val = m.search(key);
+	    
 	    if (val != null) {
 		// TODO Set the return val at position 2
-			tpl.setElem(2, val);
+		
 		// TODO Emit tpl
-			cxt.emit(tpl);
 	    }
 	}
     }
@@ -159,17 +154,14 @@ public class KDTreeIndex_Stub {
 	throws AmosException, KeyDuplicateException, KeySizeException,
 	KeyMissingException{
 	// TODO Get the id 
-		int id = tpl.getIntElem(0);
 
 	// TODO Extract feature vector f as key
-		double [] key  = toArray(tpl.getSeqElem(1));
 
-	KDTree<Oid> m = locateKdtree(id);	
+	KDTree<Oid> m = null;	
 	// TODO Get the KD-tree whose id = id
 
 	if (m != null){
 	    // TODO Delete a node 
-	    m.delete(key);
 
 	}
 	cxt.emit(tpl);
@@ -184,15 +176,14 @@ public class KDTreeIndex_Stub {
      -----------------------------------------------------------------*/
     public void kdtree_clear(CallContext cxt, Tuple tpl)
 	throws AmosException{
-	// TODO Get the id
-		int id = tpl.getIntElem(0); 
+	// TODO Get the id 
 
-	KDTree<Oid> m = locateKdtree(id);
+	KDTree<Oid> m = null;
 	// TODO Get the KD-tree whose id = id
 
 	if (m != null){
 	    // TODO remove from the list.
-		m_lkdtrees.remove(m);
+
 	}
 	cxt.emit(tpl);
     }    
@@ -205,28 +196,22 @@ public class KDTreeIndex_Stub {
 	KeySizeException,
 	java.lang.IllegalArgumentException {
 	// TODO Get the id 
-	int id = tpl.getIntElem(0);
+
 	// TODO Extract feature vector f as key
-	double [] key  = toArray(tpl.getSeqElem(1));
+
 	// TODO Get the distance 
-	double distance = tpl.getDoubleElem(2);
-
-
     
 	KDTree<Oid>  m = null;
 	// TODO Get the KD-tree whose id = id
-	m = locateKdtree(id);
-
+	
 	if (m != null && m.size() > 0){
 	    // TODO Find all values whose keys are within distance dist. 
 	    List<Oid> ln = null; // list of values 
-	    ln = m.nearestEuclidean(key, distance);
+
 	    if (ln != null && ln.size() > 0) {		
 		// Loop through and emit the found values
 		for(Oid val : ln) {
 		    // TODO set val to tpl and emit
-		    tpl.setElem(3,val);
-            cxt.emit(tpl); 
 		}
 	    }
 	}

@@ -1,4 +1,4 @@
- /*-*-sql-*-******************************************************************
+/*-*-sql-*-*******************************************************************
  * AMOS2
  *
  * Author: (c) 2011 Thanh Truong, UDBL
@@ -36,8 +36,8 @@ create function addwinesample(Vector of Number csvrow, Vector of Number csvpos)
     /* Add one new wine sample to the database */
     as begin
         declare WineSample ws;
-  create WineSample(wsId, features) 
-  instances ws (csvrow[0], project(csvrow, csvpos));
+	create WineSample(wsId, features) 
+ 	instances ws (csvrow[0], project(csvrow, csvpos));
        end;
 
 /* Read all samples from the CVS file into the database */
@@ -63,11 +63,6 @@ getSample(37);
 /* Look at execution plan of getSample: */
 pc("getSample");
 /*TODO 1.b How will it scale? Why? */
-/*
-ANSWER: Since the execution plan includes the HASH-FULL-SCAN operator it will iterate over entire index. If the table is large this will result in many iterations and will not scale. 
-*/
-
-
 
 /* Run getSample 10 times to see execution time: */
 getSample(37);
@@ -77,13 +72,9 @@ getSample(37);
 getSample(37);
 /* Comments on speed? */
 /*TODO 1.b How will it scale? Why? */
-/*
-ANSWER: Always take 0,001 seconds on my machine. Not very fast?
-*/
 
 /* Make hash index on WSID to speed up getSample: */
 /*TODO 1.c */
-create_index("getSample", "wsId", "HASH", "unique");
 
 /* Reoptimize getSample: */
 reoptimize("getSample");
@@ -91,9 +82,6 @@ reoptimize("getSample");
 /* Inspect execution plan of getSample: */
 pc("getSample");
 /*TODO 1.c How will it scale? Why? */
-/*
-ANSWER: Since the execution plan includes the HASH-INDEX-GET operator it will find the singe tuple matching the key directly and will thus scale well.  
-*/
 
 /* Run getSample 10 times to see execution time: */
 getSample(37);
@@ -103,21 +91,16 @@ getSample(37);
 getSample(37);
 /* Comments on speed compared to before indexeing? Why this result? */
 /*TODO 1.c How will it scale? Why? */
-/*
-ANSWER: Still takes 0,001. No idea why. 
-*/
 
 /* -----------------------------------------------------------------------
  Exercise 2: 
    Make a function to find all wine samples whose feature vectors are
    within distance from a given wine sample ws 
  ------------------------------------------------------------------------ */
-
+create function closeWineSamples(WineSample ws, Number distance)
+                               -> Bag of WineSample
   /* Find wine samples within distance from a give wine sample ws */
   /**TODO 2.a Your code here*/;
-  create function closeWineSamples(WineSample ws, Number distance) -> Bag of WineSample as
-      select w from WineSample w where euclid(features(ws), features(w)) <= distance;  
-
 
 /* Test closeWineSamples: */
 set :ws = getSample(37);
@@ -127,9 +110,6 @@ closeWineSamples(:ws, 3);
 /* Inspect the execution plan of closeWineSample: */
 pc("closeWineSamples");
 /* TODO 2.b How will it scale? Why? */
-/*
-ANSWER: Probably doesn't scale very well since the execution plan inludes the HASH-FULL-SCAN operator.
-*/
 
 /* Run it 10 times to investigate speed */
 closeWineSamples(:ws, 3);
@@ -138,9 +118,6 @@ closeWineSamples(:ws, 3);
 
 closeWineSamples(:ws, 3);
 /**TODO 2.b Give your comments on speed. Why this result? */
-/*
-ANSWER: Executes in 0,007-0,008 seconds. Iterates over the entire index.
-*/
 
 /* ----------------------------------------------------------------------
   Exercise 3.a
@@ -160,8 +137,6 @@ create function kdtree_make() -> Integer xid
  ------------------------------------------------------------------------ */
 create function winesampleIndex()-> Integer as stored;
 /**TODO 3.b Your code here*/
-  set :kd_index = kdtree_make();
-  set winesampleIndex() = :kd_index;
 
 /* ----------------------------------------------------------------------
   Exercise 3.c
@@ -215,8 +190,7 @@ create function kdtreeProximitySearch(Integer xid, Vector of Number f,
  ------------------------------------------------------------------------ */
 create function closeWineSamples2(WineSample ws, Number distance) 
                                 -> Bag of WineSample
-  /**TODO 4.b Your code here*/
-    as kdtreeProximitySearch(winesampleIndex(), features(ws), distance);
+  /**TODO 4.b Your code here*/;
 
 /* What are the wine samples within distance 5 from :ws? */
 closeWineSamples2(:ws, 3); /* New way */
@@ -234,9 +208,6 @@ pc("closeWinesamples");
 pc("closeWinesamples2");
 /* Notice that winesampleindex() contains exactly one object */
 /** TODO Comments? Will it scale? Why? */
-/*
-ANSWER: closeWinesamples2 scales better than closewinsamples since it uses KDTREE index instead of ECLIDBBF.
-*/
 
 /* Run proximity query 10 times for closeWinsamples (old way)
    to investgate speed: */
@@ -254,12 +225,6 @@ closeWineSamples2(:ws, 3); /* New way */
 
 closeWineSamples2(:ws, 3); /* New way */
 /* TODO 5 Comments on result? Why? */
-/*
-
-ANSWER: closeWineSimples takes 0,018591 seconds while closeWineSamples2 takes 0,000432 seconds.
-	Since KDTREE index is faster in this case when we are doing a range search.
-
-*/
 
 /* -----------------------------------------------------------------------
  Exercise 6.a 
@@ -304,7 +269,7 @@ add_index_rewrite_rule('KDTREE', #'euclid', #'kdtreeProximitySearch');
   Index the parameter 'f' of the table 'features' using KDTREE index
  ------------------------------------------------------------------------ */
 /**TODO 6.c Your code here*/
-create_index('features', 'f', 'KDTREE', 'unique');
+
 recompile(#'closeWineSamples');
 
 pc("closeWinesamples");
@@ -328,7 +293,6 @@ closeWinesamples(:ws,3);
   using KDTREE index to one using XTREE instead
  ------------------------------------------------------------------------ */
 /**TODO 7.a */
-create_index('features', 'f', 'XTREE', 'unique');
 
 /* Reoptimize closeWinesamples: */
 reoptimize("closeWinesamples");
@@ -351,8 +315,7 @@ closeWineSamples(:ws, 3);
   Make function to find wine samples having a given wine sample:
  ------------------------------------------------------------------------ */
 create function featuredWineSamples(Vector of Number fv)->Bag of Winesample
-  /**TODO 8.a Your code here */
-    as select ws from Winesample ws where features(ws) = fv;
+  /**TODO 8.a Your code here */;
 
 
 set :fv = {7,0.31,0.26,7.4,0.069,28,160,0.9954,3.13,0.46,9.8};
